@@ -17,9 +17,10 @@ export default function GallerySection() {
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    const items = sectionRef.current?.querySelectorAll('.gallery-item')
+    const items = sectionRef.current?.querySelectorAll<HTMLElement>('.gallery-item')
     if (!items) return
 
+    // ── Scroll reveal ────────────────────────────────────────
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -31,9 +32,46 @@ export default function GallerySection() {
       },
       { threshold: 0.08, rootMargin: '0px 0px -30px 0px' }
     )
-
     items.forEach((item) => observer.observe(item))
-    return () => observer.disconnect()
+
+    // ── 3D depth-lift tilt ───────────────────────────────────
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const cleanups: (() => void)[] = []
+
+    if (!reduced) {
+      items.forEach((item) => {
+        item.classList.add('tilt-card')
+
+        const onMove = (e: MouseEvent) => {
+          const r    = item.getBoundingClientRect()
+          const x    = (e.clientX - r.left) / r.width
+          const y    = (e.clientY - r.top)  / r.height
+          const rotX = (0.5 - y) * 14
+          const rotY = (x - 0.5) * 14
+          item.style.transform = `perspective(600px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.05,1.05,1.05) translateZ(20px)`
+          item.style.zIndex = '10'
+          item.style.boxShadow = `0 25px 60px rgba(0,0,0,0.5), 0 0 30px rgba(124,58,237,0.25)`
+        }
+
+        const onLeave = () => {
+          item.style.transform = 'perspective(600px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1) translateZ(0)'
+          item.style.zIndex = ''
+          item.style.boxShadow = ''
+        }
+
+        item.addEventListener('mousemove',  onMove)
+        item.addEventListener('mouseleave', onLeave)
+        cleanups.push(() => {
+          item.removeEventListener('mousemove',  onMove)
+          item.removeEventListener('mouseleave', onLeave)
+        })
+      })
+    }
+
+    return () => {
+      observer.disconnect()
+      cleanups.forEach((fn) => fn())
+    }
   }, [])
 
   return (

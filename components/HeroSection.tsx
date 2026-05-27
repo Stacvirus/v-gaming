@@ -13,23 +13,44 @@ const FLOATING_BADGES = [
 ]
 
 export default function HeroSection() {
-  const heroRef = useRef<HTMLElement>(null)
+  const heroRef    = useRef<HTMLElement>(null)
+  const contentRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const hero = heroRef.current
+    const hero    = heroRef.current
+    const content = contentRef.current
     if (!hero) return
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
     const onMouseMove = (e: MouseEvent) => {
       const { clientX, clientY } = e
       const { innerWidth, innerHeight } = window
+
+      // Existing orb parallax
       const xPct = (clientX / innerWidth - 0.5) * 20
       const yPct = (clientY / innerHeight - 0.5) * 10
       hero.style.setProperty('--mx', `${xPct}px`)
       hero.style.setProperty('--my', `${yPct}px`)
+
+      // 3D perspective tilt on the content block
+      if (content && !reduced) {
+        const rotX = ((clientY / innerHeight) - 0.5) * -7   // top edge tilts toward viewer
+        const rotY = ((clientX / innerWidth)  - 0.5) *  7
+        content.style.transform = `perspective(1400px) rotateX(${rotX}deg) rotateY(${rotY}deg)`
+      }
     }
 
-    window.addEventListener('mousemove', onMouseMove, { passive: true })
-    return () => window.removeEventListener('mousemove', onMouseMove)
+    const onMouseLeave = () => {
+      if (content) content.style.transform = 'perspective(1400px) rotateX(0deg) rotateY(0deg)'
+    }
+
+    window.addEventListener('mousemove',  onMouseMove,  { passive: true })
+    hero.addEventListener('mouseleave', onMouseLeave)
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove)
+      hero.removeEventListener('mouseleave', onMouseLeave)
+    }
   }, [])
 
   const scrollToActivities = () => {
@@ -74,8 +95,12 @@ export default function HeroSection() {
         </div>
       ))}
 
-      {/* Main content */}
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-20 pb-12">
+      {/* Main content — 3D tilt driven by mousemove */}
+      <div
+        ref={contentRef}
+        className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 text-center pt-20 pb-12"
+        style={{ transition: 'transform 0.12s ease-out', willChange: 'transform' }}
+      >
         {/* Label */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass border border-neon-purple/30 mb-8">
           <span className="w-2 h-2 rounded-full bg-neon-cyan animate-pulse-neon" />

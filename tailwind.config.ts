@@ -92,6 +92,25 @@ const config: Config = {
           '0%': { transform: 'translateY(-100%)' },
           '100%': { transform: 'translateY(100vh)' },
         },
+        // 3D gyroscope rings — each axis independent
+        'spin-x': {
+          '0%':   { transform: 'rotateX(0deg)' },
+          '100%': { transform: 'rotateX(360deg)' },
+        },
+        'spin-y': {
+          '0%':   { transform: 'rotateY(0deg)' },
+          '100%': { transform: 'rotateY(360deg)' },
+        },
+        'spin-z': {
+          '0%':   { transform: 'rotateZ(0deg)' },
+          '100%': { transform: 'rotateZ(360deg)' },
+        },
+        // Soft 3D bob — for hero content block
+        'bob-3d': {
+          '0%, 100%': { transform: 'perspective(1400px) rotateX(0deg) rotateY(0deg)' },
+          '25%':       { transform: 'perspective(1400px) rotateX(1.5deg) rotateY(-1.5deg)' },
+          '75%':       { transform: 'perspective(1400px) rotateX(-1.5deg) rotateY(1.5deg)' },
+        },
       },
       animation: {
         float: 'float 6s ease-in-out infinite',
@@ -107,6 +126,10 @@ const config: Config = {
         shimmer: 'shimmer 2.5s linear infinite',
         'rotate-slow': 'rotate-slow 25s linear infinite',
         'border-flow': 'border-flow 2.5s ease-in-out infinite',
+        'spin-x': 'spin-x 9s linear infinite',
+        'spin-y': 'spin-y 12s linear infinite',
+        'spin-z': 'spin-z 16s linear infinite reverse',
+        'bob-3d': 'bob-3d 8s ease-in-out infinite',
       },
     },
   },

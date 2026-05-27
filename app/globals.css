@@ -259,6 +259,62 @@ body {
   }
 }
 
+/* ─── 3D Utilities ──────────────────────────────────── */
+
+/* Required for nested 3D transforms to render in depth */
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* Tilt card base — applied via JS, transition smooths return-to-flat */
+.tilt-card {
+  will-change: transform;
+  transition: transform 0.15s ease-out, box-shadow 0.25s ease;
+}
+
+/* Shine overlay that moves with the tilt via JS --shine-x/--shine-y CSS vars */
+.tilt-shine {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle at var(--shine-x, 50%) var(--shine-y, 50%),
+    rgba(255,255,255,0.10) 0%,
+    rgba(255,255,255,0.04) 35%,
+    transparent 65%
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.tilt-card:hover .tilt-shine {
+  opacity: 1;
+}
+
+/* 3D gyroscope ring helpers */
+.gyro-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid transparent;
+}
+
+/* Keyframes referenced by inline style={{ animation }} on gyro rings */
+@keyframes spin-x {
+  from { transform: rotateX(0deg); }
+  to   { transform: rotateX(360deg); }
+}
+
+@keyframes spin-y {
+  from { transform: rotateY(0deg); }
+  to   { transform: rotateY(360deg); }
+}
+
+@keyframes spin-z {
+  from { transform: rotateZ(0deg); }
+  to   { transform: rotateZ(360deg); }
+}
+
 /* ─── Gallery image placeholder ─────────────────────── */
 .gallery-placeholder {
   background: linear-gradient(145deg, #141428, #1A1A3E);

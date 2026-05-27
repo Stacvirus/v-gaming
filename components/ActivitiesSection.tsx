@@ -56,9 +56,10 @@ export default function ActivitiesSection() {
   const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    const cards = sectionRef.current?.querySelectorAll('.activity-card')
+    const cards = sectionRef.current?.querySelectorAll<HTMLElement>('.activity-card')
     if (!cards) return
 
+    // ── Scroll reveal ────────────────────────────────────────
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -70,9 +71,45 @@ export default function ActivitiesSection() {
       },
       { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
     )
-
     cards.forEach((card) => observer.observe(card))
-    return () => observer.disconnect()
+
+    // ── 3D mouse-tracking tilt ───────────────────────────────
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const cleanups: (() => void)[] = []
+
+    if (!reduced) {
+      cards.forEach((card) => {
+        card.classList.add('tilt-card')
+
+        const onMove = (e: MouseEvent) => {
+          const r    = card.getBoundingClientRect()
+          const x    = (e.clientX - r.left)  / r.width   // 0–1
+          const y    = (e.clientY - r.top)   / r.height  // 0–1
+          const rotX = (0.5 - y) * 18   // negative = top edge tilts toward viewer
+          const rotY = (x - 0.5) * 18
+          // Update shine position CSS vars for the overlay
+          card.style.setProperty('--shine-x', `${x * 100}%`)
+          card.style.setProperty('--shine-y', `${y * 100}%`)
+          card.style.transform = `perspective(700px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.04,1.04,1.04) translateZ(10px)`
+        }
+
+        const onLeave = () => {
+          card.style.transform = 'perspective(700px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1) translateZ(0)'
+        }
+
+        card.addEventListener('mousemove',  onMove)
+        card.addEventListener('mouseleave', onLeave)
+        cleanups.push(() => {
+          card.removeEventListener('mousemove',  onMove)
+          card.removeEventListener('mouseleave', onLeave)
+        })
+      })
+    }
+
+    return () => {
+      observer.disconnect()
+      cleanups.forEach((fn) => fn())
+    }
   }, [])
 
   return (
@@ -105,6 +142,9 @@ export default function ActivitiesSection() {
                 style={{ transitionDelay: `${index * 0.08}s` }}
                 aria-label={activity.title}
               >
+                {/* Shine overlay — position driven by JS --shine-x/--shine-y */}
+                <div className="tilt-shine" aria-hidden="true" />
+
                 {/* Badge */}
                 {activity.badge && (
                   <div className="flex justify-end mb-3">
