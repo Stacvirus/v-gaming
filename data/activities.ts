@@ -1,3 +1,5 @@
+import type { VisualType, LottieKey } from '@/types/assets'
+
 export interface Activity {
   id: string
   title: string
@@ -9,6 +11,9 @@ export interface Activity {
   badge?: string
   priceFrom?: string
   details?: string[]
+  visualType?: VisualType
+  iconKey?: LottieKey
+  modelPath?: string
 }
 
 // Future: fetch from CMS/API to replace this static array
@@ -24,6 +29,9 @@ export const activities: Activity[] = [
     glowClass: 'card-glow-purple',
     badge: 'Premium',
     details: ['Casques VR dernière génération', 'Expériences multi-joueurs', 'Contenu renouvelé'],
+    visualType: 'model',
+    modelPath: '/models/vr-headset.glb',
+    iconKey: 'vr',
   },
   {
     id: 'simulator',
@@ -37,6 +45,9 @@ export const activities: Activity[] = [
     badge: 'Featured',
     priceFrom: 'XAF 3,500',
     details: ['Siège baquet avec retour de force', 'Circuits réalistes', 'Compétition de temps'],
+    visualType: 'model',
+    modelPath: '/models/arcade-machine.glb',
+    iconKey: 'simulator',
   },
   {
     id: 'billiards',
@@ -48,6 +59,7 @@ export const activities: Activity[] = [
     accentColor: '#06B6D4',
     glowClass: 'card-glow-cyan',
     details: ['Tables homologuées', 'Tournois réguliers', 'Location à l\'heure'],
+    visualType: 'model',
   },
   {
     id: 'babyfoot',
@@ -59,6 +71,7 @@ export const activities: Activity[] = [
     accentColor: '#3B82F6',
     glowClass: 'card-glow-blue',
     details: ['Tables anti-rebond', 'Tournois hebdomadaires', 'Parties libres'],
+    visualType: 'model',
   },
   {
     id: 'pingpong',
@@ -70,6 +83,7 @@ export const activities: Activity[] = [
     accentColor: '#EC4899',
     glowClass: 'card-glow-pink',
     details: ['Tables de compétition', 'Équipement fourni', 'Coaching disponible'],
+    visualType: 'model',
   },
   {
     id: 'boardgames',
@@ -81,6 +95,7 @@ export const activities: Activity[] = [
     accentColor: '#F59E0B',
     glowClass: 'card-glow-amber',
     details: ['Bibliothèque de 200+ jeux', 'Animateurs disponibles', 'Soirées thématiques'],
+    visualType: 'model',
   },
   {
     id: 'kids',
@@ -93,6 +108,8 @@ export const activities: Activity[] = [
     glowClass: 'card-glow-purple',
     badge: 'Family',
     details: ['Jeux sécurisés 3–12 ans', 'Animateurs professionnels', 'Anniversaires enfants'],
+    visualType: 'lottie',
+    iconKey: 'kids',
   },
   {
     id: 'pool',
@@ -105,5 +122,7 @@ export const activities: Activity[] = [
     glowClass: 'card-glow-cyan',
     badge: 'Relax',
     details: ['Piscine chauffée', 'Terrasse & chaises longues', 'Service bar au bord'],
+    visualType: 'lottie',
+    iconKey: 'pool',
   },
 ]

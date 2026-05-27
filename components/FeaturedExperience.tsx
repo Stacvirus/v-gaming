@@ -1,6 +1,19 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import dynamic from 'next/dynamic'
+
+const ArcadeMachineScene = dynamic(
+  () => import('@/components/3d/ArcadeMachineScene'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full shimmer-bg rounded-2xl flex items-center justify-center">
+        <div className="w-16 h-16 rounded-full border border-neon-rose/40 animate-pulse" />
+      </div>
+    ),
+  }
+)
 
 const WA_NUMBER = '237698453633'
 const WA_MESSAGE = encodeURIComponent('Bonjour V-GAMING ! Je veux réserver le Super Engine (simulateur auto). Pouvez-vous me confirmer la disponibilité ?')
@@ -97,78 +110,9 @@ export default function FeaturedExperience() {
               {/* Simulator visual card */}
               <div className="relative rounded-3xl overflow-hidden border border-neon-rose/30 neon-glow-pink"
                 style={{ boxShadow: '0 0 60px rgba(244,63,94,0.2), 0 0 120px rgba(244,63,94,0.1)' }}>
-                {/* Placeholder visual — replace with real image */}
-                <div className="aspect-[4/3] gallery-placeholder flex flex-col items-center justify-center">
-                  {/* 3D Gyroscope — three rings on independent axes */}
-                  <div
-                    className="relative preserve-3d"
-                    style={{ width: 220, height: 220 }}
-                    aria-hidden="true"
-                  >
-                    {/* Core icon — sits at Z=0 */}
-                    <div
-                      className="absolute inset-0 flex items-center justify-center"
-                      style={{ zIndex: 2 }}
-                    >
-                      <div
-                        className="w-24 h-24 rounded-full border-2 border-neon-rose/70 flex items-center justify-center"
-                        style={{ boxShadow: '0 0 40px rgba(244,63,94,0.55), 0 0 80px rgba(244,63,94,0.2)' }}
-                      >
-                        <svg viewBox="0 0 24 24" fill="none" stroke="#F43F5E" strokeWidth="1.5" className="w-12 h-12" aria-label="Car simulator icon">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-                        </svg>
-                      </div>
-                    </div>
-
-                    {/* Ring 1 — rotates on Y axis (widest) */}
-                    <div
-                      className="gyro-ring absolute"
-                      style={{
-                        inset: 10,
-                        border: '1px solid rgba(244,63,94,0.55)',
-                        boxShadow: '0 0 12px rgba(244,63,94,0.3)',
-                        animation: 'spin-y 9s linear infinite',
-                        transformStyle: 'preserve-3d',
-                      }}
-                    />
-
-                    {/* Ring 2 — rotates on X axis */}
-                    <div
-                      className="gyro-ring absolute"
-                      style={{
-                        inset: 0,
-                        border: '1px solid rgba(167,139,250,0.50)',
-                        boxShadow: '0 0 10px rgba(167,139,250,0.25)',
-                        animation: 'spin-x 12s linear infinite',
-                        transformStyle: 'preserve-3d',
-                      }}
-                    />
-
-                    {/* Ring 3 — rotates on Z axis (outermost) */}
-                    <div
-                      className="gyro-ring absolute"
-                      style={{
-                        inset: -16,
-                        border: '1px solid rgba(6,182,212,0.35)',
-                        boxShadow: '0 0 14px rgba(6,182,212,0.18)',
-                        animation: 'spin-z 16s linear infinite reverse',
-                        transformStyle: 'preserve-3d',
-                      }}
-                    />
-
-                    {/* Outer glow halo */}
-                    <div
-                      className="absolute rounded-full pointer-events-none"
-                      style={{
-                        inset: -30,
-                        background: 'radial-gradient(circle, rgba(244,63,94,0.12) 0%, transparent 70%)',
-                      }}
-                    />
-                  </div>
-                  <p className="mt-8 text-text-dim text-sm font-body tracking-widest uppercase">
-                    Super Engine · Racing Simulator
-                  </p>
-                  {/* CMS hook: replace with <Image src={product.image} ... /> */}
+                {/* 3D ArcadeMachineScene — falls back to shimmer while loading */}
+                <div className="aspect-square max-w-[280px] mx-auto">
+                  <ArcadeMachineScene className="w-full h-full" />
                 </div>
 
                 {/* Scanline overlay */}

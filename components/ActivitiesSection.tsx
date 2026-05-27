@@ -1,7 +1,19 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import dynamic from 'next/dynamic'
 import { activities } from '@/data/activities'
+import type { Activity } from '@/data/activities'
+import type { LottieKey } from '@/data/assets'
+
+// Lazy-load heavy 3D and animation components (SSR disabled)
+const VRHeadsetScene     = dynamic(() => import('@/components/3d/VRHeadsetScene'),     { ssr: false, loading: () => <div className="w-full h-44 shimmer-bg rounded-xl" /> })
+const ArcadeMachineScene = dynamic(() => import('@/components/3d/ArcadeMachineScene'), { ssr: false, loading: () => <div className="w-full h-44 shimmer-bg rounded-xl" /> })
+const BabyFootScene      = dynamic(() => import('@/components/3d/BabyFootScene'),      { ssr: false, loading: () => <div className="w-full h-44 shimmer-bg rounded-xl" /> })
+const PingPongScene      = dynamic(() => import('@/components/3d/PingPongScene'),      { ssr: false, loading: () => <div className="w-full h-44 shimmer-bg rounded-xl" /> })
+const BoardGamesScene    = dynamic(() => import('@/components/3d/BoardGamesScene'),    { ssr: false, loading: () => <div className="w-full h-44 shimmer-bg rounded-xl" /> })
+const BilliardScene      = dynamic(() => import('@/components/3d/BilliardScene'),      { ssr: false, loading: () => <div className="w-full h-44 shimmer-bg rounded-xl" /> })
+const AnimatedActivityIcon = dynamic(() => import('@/components/animations/AnimatedActivityIcon'), { ssr: false, loading: () => <div className="w-full h-24 shimmer-bg rounded-xl" /> })
 
 const ICONS: Record<string, React.FC<{ className?: string; style?: React.CSSProperties }>> = {
   Glasses: ({ className }) => (
@@ -50,6 +62,50 @@ const ICONS: Record<string, React.FC<{ className?: string; style?: React.CSSProp
       <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 15.375c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 01-1.125-1.125v-4.5z" />
     </svg>
   ),
+}
+
+function getActivityVisual(activity: Activity) {
+  const IconComp = ICONS[activity.icon]
+  const staticIcon = (
+    <div
+      className="w-14 h-14 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200"
+      style={{
+        background: `${activity.accentColor}18`,
+        border: `1px solid ${activity.accentColor}35`,
+        boxShadow: `0 0 20px ${activity.accentColor}22`,
+      }}
+    >
+      {IconComp && (
+        <IconComp
+          className="w-7 h-7"
+          style={{ color: activity.accentColor } as React.CSSProperties}
+        />
+      )}
+    </div>
+  )
+
+  if (activity.visualType === 'model') {
+    if (activity.id === 'vr')         return <VRHeadsetScene     className="w-full h-44" />
+    if (activity.id === 'simulator')  return <ArcadeMachineScene  className="w-full h-44" />
+    if (activity.id === 'babyfoot')   return <BabyFootScene       className="w-full h-44" />
+    if (activity.id === 'pingpong')   return <PingPongScene       className="w-full h-44" />
+    if (activity.id === 'boardgames') return <BoardGamesScene     className="w-full h-44" />
+    if (activity.id === 'billiards')  return <BilliardScene       className="w-full h-44" />
+    return staticIcon
+  }
+
+  if (activity.visualType === 'lottie') {
+    return (
+      <AnimatedActivityIcon
+        iconKey={activity.iconKey as LottieKey}
+        fallback={staticIcon}
+        className="w-full h-24"
+        ariaLabel={activity.title}
+      />
+    )
+  }
+
+  return staticIcon
 }
 
 export default function ActivitiesSection() {
@@ -134,7 +190,6 @@ export default function ActivitiesSection() {
         {/* Activity cards grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {activities.map((activity, index) => {
-            const IconComp = ICONS[activity.icon]
             return (
               <article
                 key={activity.id}
@@ -161,21 +216,9 @@ export default function ActivitiesSection() {
                   </div>
                 )}
 
-                {/* Icon */}
-                <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-200"
-                  style={{
-                    background: `${activity.accentColor}18`,
-                    border: `1px solid ${activity.accentColor}35`,
-                    boxShadow: `0 0 20px ${activity.accentColor}22`,
-                  }}
-                >
-                  {IconComp && (
-                    <IconComp
-                      className="w-7 h-7"
-                      style={{ color: activity.accentColor } as React.CSSProperties}
-                    />
-                  )}
+                {/* Animated visual — 3D model, Lottie, or static SVG */}
+                <div className="mb-5">
+                  {getActivityVisual(activity)}
                 </div>
 
                 {/* Content */}

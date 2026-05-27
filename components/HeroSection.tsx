@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import DynamicHeroSpline from '@/components/3d/DynamicHeroSpline'
+import { HERO_SPLINE_URL } from '@/data/assets'
 
 const WA_NUMBER = '237698453633'
 const WA_URL = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent('Bonjour V-GAMING ! Je souhaite réserver une expérience.')}`
@@ -64,6 +66,18 @@ export default function HeroSection() {
       className="relative min-h-screen flex items-center justify-center overflow-hidden hero-grid scanlines"
       style={{ '--mx': '0px', '--my': '0px' } as React.CSSProperties}
     >
+      {/* Spline 3D hero background — only renders when NEXT_PUBLIC_SPLINE_HERO_SCENE_URL is set */}
+      {HERO_SPLINE_URL && (
+        <>
+          <DynamicHeroSpline
+            sceneUrl={HERO_SPLINE_URL}
+            className="absolute inset-0 w-full h-full pointer-events-none z-0"
+          />
+          {/* Gradient overlay to preserve text contrast over Spline scene */}
+          <div className="absolute inset-0 bg-gradient-to-b from-gaming-dark/60 via-gaming-dark/30 to-gaming-dark/70 pointer-events-none z-0" />
+        </>
+      )}
+
       {/* Radial orb overlays */}
       <div className="absolute inset-0 bg-hero-orbs pointer-events-none" />
 
